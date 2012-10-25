@@ -24,6 +24,11 @@ namespace BrockAllen.OAuth2
             if (sam != null)
             {
                 var cp = new ClaimsPrincipal(new ClaimsIdentity(result.Claims, "OAuth"));
+                var transformer = FederatedAuthentication.FederationConfiguration.IdentityConfiguration.ClaimsAuthenticationManager;
+                if (transformer != null)
+                {
+                    cp = transformer.Authenticate(String.Empty, cp);
+                }
                 var token = new SessionSecurityToken(cp);
                 sam.WriteSessionTokenToCookie(token);
             }
