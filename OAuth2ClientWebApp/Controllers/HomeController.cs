@@ -16,10 +16,12 @@ namespace OAuth2ClientWebApp.Controllers
                 ProviderType.Google,
                 "421418234584-3n8ub7gn7gt0naghh6sqeu7l7l45te1c.apps.googleusercontent.com",
                 "KDJt_7Rm6Or2pJulBdy0gvpx");
+
             OAuth2Client.RegisterProvider(
                 ProviderType.Facebook, 
                 "195156077252380",
                 "39b565fd85265c56010555f670573e28");
+            
             OAuth2Client.RegisterProvider(
                 ProviderType.Live, 
                 "00000000400DF045",
@@ -28,12 +30,13 @@ namespace OAuth2ClientWebApp.Controllers
 
         public ActionResult Index()
         {
-            var url = Url.Action("Callback", "OAuthController", new { area = "OAuth2Client" });
             return View();
         }
         
         public ActionResult Login(ProviderType name)
         {
+            // 1st param is which OAuth2 provider to use
+            // 2nd param is what URL to send the user once all the login magic is done
             return new OAuth2ActionResult(name, Url.Action("Index"));
         }
     }
