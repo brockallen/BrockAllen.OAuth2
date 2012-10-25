@@ -23,7 +23,9 @@ namespace BrockAllen.OAuth2
             get
             {
                 var ctx = System.Web.HttpContext.Current;
-                var url = new Uri(ctx.Request.Url, ctx.Request.ApplicationPath + "/" + OAuth2Client.OAuthCallbackUrl);
+                var app = ctx.Request.ApplicationPath;
+                if (!app.EndsWith("/")) app += "/";
+                var url = new Uri(ctx.Request.Url, app + OAuth2Client.OAuthCallbackUrl);
                 return url.AbsoluteUri;
             }
         }
@@ -95,7 +97,7 @@ namespace BrockAllen.OAuth2
         {
             var json = authCtx.ToJson();
             var cookie = new HttpCookie(AuthorizationContextCookieName, json);
-            cookie.Secure = true;
+            cookie.Secure = ctx.Request.IsSecureConnection;
             cookie.HttpOnly = true;
             cookie.Path = ctx.Request.ApplicationPath;
             ctx.Response.Cookies.Add(cookie);
@@ -108,7 +110,7 @@ namespace BrockAllen.OAuth2
             var authCtx = AuthorizationContext.Parse(cookie.Value);
 
             cookie = new HttpCookie(AuthorizationContextCookieName, ".");
-            cookie.Secure = true;
+            cookie.Secure = ctx.Request.IsSecureConnection;
             cookie.HttpOnly = true;
             cookie.Path = ctx.Request.ApplicationPath;
             cookie.Expires = DateTime.UtcNow.AddYears(-1);
