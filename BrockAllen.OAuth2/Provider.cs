@@ -71,7 +71,7 @@ namespace BrockAllen.OAuth2
             return ctx;
         }
 
-        public AuthorizationToken GetTokenFromCallback(
+        public async Task<AuthorizationToken> GetTokenFromCallbackAsync(
             AuthorizationContext ctx, 
             NameValueCollection queryString)
         {
@@ -106,21 +106,21 @@ namespace BrockAllen.OAuth2
             postValues.Add(new KeyValuePair<string, string>("redirect_uri", OAuth2Client.RedirectUrl));
             postValues.Add(new KeyValuePair<string, string>("grant_type", "authorization_code"));
 
-            return this.GetTokenFromCallbackInternal(postValues);
+            return await this.GetTokenFromCallbackInternalAsync(postValues);
         }
         
-        protected virtual AuthorizationToken GetTokenFromCallbackInternal(List<KeyValuePair<string, string>> postValues)
+        protected virtual async Task<AuthorizationToken> GetTokenFromCallbackInternalAsync(List<KeyValuePair<string, string>> postValues)
         {
             HttpClient client = new HttpClient();
             var content = new FormUrlEncodedContent(postValues);
-            var result = client.PostAsync(this.TokenUrl, content).Result;
+            var result = await client.PostAsync(this.TokenUrl, content);
             if (result.IsSuccessStatusCode)
             {
-                return ProcessAuthorizationTokenResponse(result);
+                return await ProcessAuthorizationTokenResponseAsync(result);
             }
             else
             {
-                var body = result.Content.ReadAsStringAsync().Result;
+                var body = await result.Content.ReadAsStringAsync();
                 return new AuthorizationToken { 
                     Error = "Error contacting token endpoint : " + result.ReasonPhrase,
                     ErrorDetails = body
@@ -128,9 +128,9 @@ namespace BrockAllen.OAuth2
             }
         }
 
-        protected virtual AuthorizationToken ProcessAuthorizationTokenResponse(HttpResponseMessage result)
+        protected async virtual Task<AuthorizationToken> ProcessAuthorizationTokenResponseAsync(HttpResponseMessage result)
         {
-            var data = result.Content.ReadAsStringAsync().Result;
+            var data = await result.Content.ReadAsStringAsync();
             if (result.Content.Headers.ContentType.MediaType.Equals("application/json"))
             {
                 // json from body
@@ -144,15 +144,15 @@ namespace BrockAllen.OAuth2
             }
         }
 
-        protected virtual IEnumerable<Claim> GetProfileClaims(AuthorizationToken token)
+        protected async virtual Task<IEnumerable<Claim>> GetProfileClaimsAsync(AuthorizationToken token)
         {
             var url = this.ProfileUrl + "?access_token=" + token.AccessToken;
             
             HttpClient client = new HttpClient();
-            var result = client.GetAsync(url).Result;
+            var result = await client.GetAsync(url);
             if (result.IsSuccessStatusCode)
             {
-                var json = result.Content.ReadAsStringAsync().Result;
+                var json = await result.Content.ReadAsStringAsync();
                 var profile = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, object>>(json);
                 return GetClaimsFromProfile(profile);
             }
@@ -172,9 +172,9 @@ namespace BrockAllen.OAuth2
             return query;
         }
 
-        internal CallbackResult ProcessCallback(AuthorizationContext authCtx, NameValueCollection nameValueCollection)
+        internal async Task<CallbackResult> ProcessCallbackAsync(AuthorizationContext authCtx, NameValueCollection nameValueCollection)
         {
-            var token = this.GetTokenFromCallback(authCtx, nameValueCollection);
+            var token = await this.GetTokenFromCallbackAsync(authCtx, nameValueCollection);
             if (token.Error != null)
             {
                 return new CallbackResult
@@ -183,7 +183,8 @@ namespace BrockAllen.OAuth2
                     ErrorDetails = token.ErrorDetails
                 };
             }
-            var claims = this.GetProfileClaims(token).ToList(); ;
+            var result = await this.GetProfileClaimsAsync(token);
+            var claims = result.ToList();
             var idpClaim = new Claim(IdentityProviderClaimType, this.Name, ClaimValueTypes.String, this.Name);
             claims.Insert(0, idpClaim);
             return new CallbackResult { Claims = claims.ToArray() };

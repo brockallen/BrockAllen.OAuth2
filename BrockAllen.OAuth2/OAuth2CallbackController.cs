@@ -12,9 +12,9 @@ namespace BrockAllen.OAuth2
 {
     public class OAuth2CallbackController : Controller
     {
-        public ActionResult Callback()
+        public async Task<ActionResult> Callback()
         {
-            var result = OAuth2Client.ProcessCallback(HttpContext);
+            var result = await OAuth2Client.ProcessCallbackAsync(HttpContext);
             if (result.Error != null)
             {
                 return Content(result.Error + "<br>" + result.ErrorDetails);

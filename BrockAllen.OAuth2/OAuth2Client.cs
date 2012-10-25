@@ -119,7 +119,7 @@ namespace BrockAllen.OAuth2
             return authCtx;
         }
 
-        internal static CallbackResult ProcessCallback(HttpContextBase ctx)
+        internal async static Task<CallbackResult> ProcessCallbackAsync(HttpContextBase ctx)
         {
             var authCtx = GetContext(ctx);
             if (authCtx == null)
@@ -130,7 +130,7 @@ namespace BrockAllen.OAuth2
                 };
             }
             var provider = GetProvider(authCtx.ProviderType);
-            var result = provider.ProcessCallback(authCtx, ctx.Request.QueryString);
+            var result = await provider.ProcessCallbackAsync(authCtx, ctx.Request.QueryString);
             result.ReturnUrl = authCtx.ReturnUrl;
             result.ProviderName = authCtx.ProviderType.ToString();
             return result;
