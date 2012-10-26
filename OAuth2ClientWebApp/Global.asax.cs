@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BrockAllen.OAuth2;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -16,6 +17,7 @@ namespace OAuth2ClientWebApp
     {
         protected void Application_Start()
         {
+            OAuth2Client.AutoRegisterOAuthCallbackUrl = true;
             AreaRegistration.RegisterAllAreas();
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
             RouteConfig.RegisterRoutes(RouteTable.Routes);

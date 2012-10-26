@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace BrockAllen.OAuth2
 {
-    class CallbackResult
+    public class CallbackResult
     {
         public string Error { get; set; }
         public string ErrorDetails { get; set; }

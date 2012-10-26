@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
+using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
 
@@ -39,5 +40,12 @@ namespace OAuth2ClientWebApp.Controllers
             // 2nd param is what URL to send the user once all the login magic is done
             return new OAuth2ActionResult(name, Url.Action("Index"));
         }
+
+        //public async Task<ActionResult> Callback()
+        //{
+        //    var result = await OAuth2Client.ProcessCallbackAsync(HttpContext);
+        //    var claims = result.Claims;
+        //    return Content("Claims");
+        //}
     }
 }

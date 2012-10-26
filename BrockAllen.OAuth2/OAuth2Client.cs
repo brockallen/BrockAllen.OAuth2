@@ -32,7 +32,7 @@ namespace BrockAllen.OAuth2
 
         static OAuth2Client()
         {
-            AutoRegisterOAuthCallbackUrl = true;
+            AutoRegisterOAuthCallbackUrl = false;
             OAuthCallbackUrl = "oauth2callback";
             AuthorizationContextCookieName = "oauth2authctx";
         }
@@ -119,7 +119,7 @@ namespace BrockAllen.OAuth2
             return authCtx;
         }
 
-        internal async static Task<CallbackResult> ProcessCallbackAsync(HttpContextBase ctx)
+        public async static Task<CallbackResult> ProcessCallbackAsync(HttpContextBase ctx)
         {
             var authCtx = GetContext(ctx);
             if (authCtx == null)
