@@ -9,6 +9,7 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web;
+using Thinktecture.IdentityModel;
 
 namespace BrockAllen.OAuth2
 {
@@ -53,7 +54,8 @@ namespace BrockAllen.OAuth2
             var url = this.AuthorizationUrl;
             var client = this.ClientID;
             var redirect = OAuth2Client.RedirectUrl;
-            var state = WebUtility.UrlEncode(Thinktecture.IdentityModel.CryptoRandom.CreateRandomKeyString(10));
+            var state = Base64Url.Encode(CryptoRandom.CreateRandomKey(10));
+            
             var scope = this.Scope;
 
             var authorizationUrl = String.Format("{0}?client_id={1}&redirect_uri={2}&state={3}&response_type=code&scope={4}",
@@ -87,7 +89,7 @@ namespace BrockAllen.OAuth2
             }
 
             string state = queryString["state"];
-            if (WebUtility.UrlDecode(ctx.State) != state)
+            if (ctx.State != state)
             {
                 return new AuthorizationToken { Error = "State does not match." };
             }
@@ -185,8 +187,12 @@ namespace BrockAllen.OAuth2
             }
             var result = await this.GetProfileClaimsAsync(token);
             var claims = result.ToList();
+
+            var authInstantClaim = new Claim(ClaimTypes.AuthenticationInstant, DateTime.UtcNow.ToString("s"), ClaimValueTypes.DateTime, this.Name);
+            claims.Insert(0, authInstantClaim);
             var idpClaim = new Claim(IdentityProviderClaimType, this.Name, ClaimValueTypes.String, this.Name);
             claims.Insert(0, idpClaim);
+            
             return new CallbackResult { Claims = claims.ToArray() };
         }
     }
