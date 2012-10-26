@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json.Linq;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
@@ -18,16 +19,11 @@ namespace BrockAllen.OAuth2
         public static string OAuthCallbackUrl { get; set; }
         public static bool AutoRegisterOAuthCallbackUrl { get; set; }
         public static string AuthorizationContextCookieName { get; set; }
-        internal static string RedirectUrl
+
+        static OAuth2Client instance = new OAuth2Client();
+        public static OAuth2Client Instance
         {
-            get
-            {
-                var ctx = System.Web.HttpContext.Current;
-                var app = ctx.Request.ApplicationPath;
-                if (!app.EndsWith("/")) app += "/";
-                var url = new Uri(ctx.Request.Url, app + OAuth2Client.OAuthCallbackUrl);
-                return url.AbsoluteUri;
-            }
+            get { return instance; }
         }
 
         static OAuth2Client()
@@ -37,10 +33,17 @@ namespace BrockAllen.OAuth2
             AuthorizationContextCookieName = "oauth2authctx";
         }
 
-        static System.Collections.Concurrent.ConcurrentDictionary<ProviderType, Provider> providers =
-            new System.Collections.Concurrent.ConcurrentDictionary<ProviderType, Provider>();
+        private OAuth2Client()
+        {
+        }
+        public OAuth2Client(ProviderType providerType, string clientID, string clientSecret)
+        {
+            this.RegisterProvider(providerType, clientID, clientSecret);
+        }
 
-        public static void RegisterProvider(ProviderType providerType, string clientID, string clientSecret)
+        ConcurrentDictionary<ProviderType, Provider> providers = new ConcurrentDictionary<ProviderType, Provider>();
+
+        public void RegisterProvider(ProviderType providerType, string clientID, string clientSecret)
         {
             Provider provider = null;
             switch (providerType)
@@ -64,7 +67,7 @@ namespace BrockAllen.OAuth2
             providers[providerType] = provider;
         }
 
-        internal static Provider GetProvider(ProviderType providerType)
+        internal Provider GetProvider(ProviderType providerType)
         {
             var provider = providers[providerType];
             if (provider == null)
@@ -74,12 +77,10 @@ namespace BrockAllen.OAuth2
             return provider;
         }
 
-        internal static void RedirectToAuthorizationProvider(
-            ProviderType providerType, 
-            System.Web.HttpContextBase ctx, 
-            string returnUrl)
+        public void RedirectToAuthorizationProvider(
+            ProviderType providerType, string returnUrl = null)
         {
-            var provider = GetProvider(providerType);
+            var provider = this.GetProvider(providerType);
 
             var redirect = provider.GetRedirect();
             var authCtx = new AuthorizationContext
@@ -88,13 +89,33 @@ namespace BrockAllen.OAuth2
                 ReturnUrl = returnUrl, 
                 State = redirect.State
             };
-            SaveContext(authCtx, ctx);
+            SaveContext(authCtx);
 
+            var ctx = HttpContext.Current;
             ctx.Response.Redirect(redirect.AuthorizationUrl);
         }
 
-        static void SaveContext(AuthorizationContext authCtx, HttpContextBase ctx)
+        public async Task<CallbackResult> ProcessCallbackAsync()
         {
+            var authCtx = GetContext();
+            if (authCtx == null)
+            {
+                return new CallbackResult 
+                { 
+                    Error = "No Authorization Context Cookie" 
+                };
+            }
+            var provider = GetProvider(authCtx.ProviderType);
+            var ctx = HttpContext.Current;
+            var result = await provider.ProcessCallbackAsync(authCtx, ctx.Request.QueryString);
+            result.ReturnUrl = authCtx.ReturnUrl;
+            result.ProviderName = authCtx.ProviderType.ToString();
+            return result;
+        }
+        
+        void SaveContext(AuthorizationContext authCtx)
+        {
+            var ctx = HttpContext.Current;
             var json = authCtx.ToJson();
             var cookie = new HttpCookie(AuthorizationContextCookieName, json);
             cookie.Secure = ctx.Request.IsSecureConnection;
@@ -103,8 +124,9 @@ namespace BrockAllen.OAuth2
             ctx.Response.Cookies.Add(cookie);
         }
 
-        static AuthorizationContext GetContext(HttpContextBase ctx)
+        AuthorizationContext GetContext()
         {
+            var ctx = HttpContext.Current;
             var cookie = ctx.Request.Cookies[AuthorizationContextCookieName];
             if (cookie == null) return null;
             var authCtx = AuthorizationContext.Parse(cookie.Value);
@@ -117,23 +139,6 @@ namespace BrockAllen.OAuth2
             ctx.Response.Cookies.Add(cookie);
 
             return authCtx;
-        }
-
-        public async static Task<CallbackResult> ProcessCallbackAsync(HttpContextBase ctx)
-        {
-            var authCtx = GetContext(ctx);
-            if (authCtx == null)
-            {
-                return new CallbackResult 
-                { 
-                    Error = "No Authorization Context Cookie" 
-                };
-            }
-            var provider = GetProvider(authCtx.ProviderType);
-            var result = await provider.ProcessCallbackAsync(authCtx, ctx.Request.QueryString);
-            result.ReturnUrl = authCtx.ReturnUrl;
-            result.ProviderName = authCtx.ProviderType.ToString();
-            return result;
         }
     }
 }

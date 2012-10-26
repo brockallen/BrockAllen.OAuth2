@@ -14,7 +14,7 @@ namespace BrockAllen.OAuth2
     {
         public async Task<ActionResult> Callback()
         {
-            var result = await OAuth2Client.ProcessCallbackAsync(HttpContext);
+            var result = await OAuth2Client.Instance.ProcessCallbackAsync();
             if (result.Error != null)
             {
                 return Content(result.Error + "<br>" + result.ErrorDetails);

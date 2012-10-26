@@ -10,15 +10,23 @@ namespace BrockAllen.OAuth2
     {
         ProviderType type;
         string returnUrl;
+        OAuth2Client client;
+
         public OAuth2ActionResult(ProviderType type, string returnUrl)
+            : this(OAuth2Client.Instance, type, returnUrl)
         {
+        }
+
+        public OAuth2ActionResult(OAuth2Client client, ProviderType type, string returnUrl)
+        {
+            this.client = client;
             this.type = type;
             this.returnUrl = returnUrl;
         }
 
         public override void ExecuteResult(System.Web.Mvc.ControllerContext context)
         {
-            OAuth2Client.RedirectToAuthorizationProvider(type, context.HttpContext, returnUrl);
+            client.RedirectToAuthorizationProvider(type, returnUrl);
         }
     }
 }

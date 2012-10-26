@@ -13,17 +13,17 @@ namespace OAuth2ClientWebApp.Controllers
     {
         static HomeController()
         {
-            OAuth2Client.RegisterProvider(
+            OAuth2Client.Instance.RegisterProvider(
                 ProviderType.Google,
                 "421418234584-3n8ub7gn7gt0naghh6sqeu7l7l45te1c.apps.googleusercontent.com",
                 "KDJt_7Rm6Or2pJulBdy0gvpx");
 
-            OAuth2Client.RegisterProvider(
+            OAuth2Client.Instance.RegisterProvider(
                 ProviderType.Facebook, 
                 "195156077252380",
                 "39b565fd85265c56010555f670573e28");
             
-            OAuth2Client.RegisterProvider(
+            OAuth2Client.Instance.RegisterProvider(
                 ProviderType.Live, 
                 "00000000400DF045",
                 "4L08bE3WM8Ra4rRNMv3N--un5YOBr4gx");

@@ -47,13 +47,25 @@ namespace BrockAllen.OAuth2
             this.ClientSecret = clientSecret;
         }
 
+        string RedirectUrl
+        {
+            get
+            {
+                var ctx = System.Web.HttpContext.Current;
+                var app = ctx.Request.ApplicationPath;
+                if (!app.EndsWith("/")) app += "/";
+                var url = new Uri(ctx.Request.Url, app + OAuth2Client.OAuthCallbackUrl);
+                return url.AbsoluteUri;
+            }
+        }
+
         internal abstract Dictionary<string, string> SupportedClaimTypes { get; }
 
         public AuthorizationRedirect GetRedirect()
         {
             var url = this.AuthorizationUrl;
             var client = this.ClientID;
-            var redirect = OAuth2Client.RedirectUrl;
+            var redirect = RedirectUrl;
             var state = Base64Url.Encode(CryptoRandom.CreateRandomKey(10));
             
             var scope = this.Scope;
@@ -105,7 +117,7 @@ namespace BrockAllen.OAuth2
             postValues.Add(new KeyValuePair<string, string>("code", code));
             postValues.Add(new KeyValuePair<string, string>("client_id", this.ClientID));
             postValues.Add(new KeyValuePair<string, string>("client_secret", this.ClientSecret));
-            postValues.Add(new KeyValuePair<string, string>("redirect_uri", OAuth2Client.RedirectUrl));
+            postValues.Add(new KeyValuePair<string, string>("redirect_uri", RedirectUrl));
             postValues.Add(new KeyValuePair<string, string>("grant_type", "authorization_code"));
 
             return await this.GetTokenFromCallbackInternalAsync(postValues);
