@@ -34,18 +34,11 @@ namespace OAuth2ClientWebApp.Controllers
             return View();
         }
         
-        public ActionResult Login(ProviderType name)
+        public ActionResult Login(ProviderType type)
         {
             // 1st param is which OAuth2 provider to use
             // 2nd param is what URL to send the user once all the login magic is done
-            return new OAuth2ActionResult(name, Url.Action("Index"));
+            return new OAuth2ActionResult(type, Url.Action("Index"));
         }
-
-        //public async Task<ActionResult> Callback()
-        //{
-        //    var result = await OAuth2Client.ProcessCallbackAsync(HttpContext);
-        //    var claims = result.Claims;
-        //    return Content("Claims");
-        //}
     }
 }

@@ -14,10 +14,6 @@ namespace OAuth2ClientWebApp
         {
             routes.IgnoreRoute("{resource}.axd/{*pathInfo}");
 
-            routes.MapRoute("oauth2callback",
-                OAuth2Client.OAuthCallbackUrl,
-                new { controller = "Home", action = "Callback" });
-
             routes.MapRoute(
                 name: "Default",
                 url: "{controller}/{action}/{id}",
