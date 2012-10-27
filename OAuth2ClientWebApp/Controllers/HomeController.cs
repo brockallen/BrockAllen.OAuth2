@@ -13,6 +13,11 @@ namespace OAuth2ClientWebApp.Controllers
     {
         static HomeController()
         {
+            RegisterOAuth2Clients();
+        }
+
+        static void RegisterOAuth2Clients()
+        {
             OAuth2Client.Instance.RegisterProvider(
                 ProviderType.Google,
                 "421418234584-3n8ub7gn7gt0naghh6sqeu7l7l45te1c.apps.googleusercontent.com",

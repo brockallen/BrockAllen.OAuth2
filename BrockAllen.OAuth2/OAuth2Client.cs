@@ -11,6 +11,7 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web;
+using System.Web.Security;
 
 namespace BrockAllen.OAuth2
 {
@@ -116,8 +117,11 @@ namespace BrockAllen.OAuth2
         void SaveContext(AuthorizationContext authCtx)
         {
             var ctx = HttpContext.Current;
+            
             var json = authCtx.ToJson();
-            var cookie = new HttpCookie(AuthorizationContextCookieName, json);
+            var data = Protect(Encoding.UTF8.GetBytes(json));
+            
+            var cookie = new HttpCookie(AuthorizationContextCookieName, data);
             cookie.Secure = ctx.Request.IsSecureConnection;
             cookie.HttpOnly = true;
             cookie.Path = ctx.Request.ApplicationPath;
@@ -129,7 +133,9 @@ namespace BrockAllen.OAuth2
             var ctx = HttpContext.Current;
             var cookie = ctx.Request.Cookies[AuthorizationContextCookieName];
             if (cookie == null) return null;
-            var authCtx = AuthorizationContext.Parse(cookie.Value);
+            
+            var json = Encoding.UTF8.GetString(Unprotect(cookie.Value));
+            var authCtx = AuthorizationContext.Parse(json);
 
             cookie = new HttpCookie(AuthorizationContextCookieName, ".");
             cookie.Secure = ctx.Request.IsSecureConnection;
@@ -139,6 +145,21 @@ namespace BrockAllen.OAuth2
             ctx.Response.Cookies.Add(cookie);
 
             return authCtx;
+        }
+
+        const string MachineKeyPurpose = "BrockAllen.OAuth2";
+        string Protect(byte[] data)
+        {
+            if (data == null || data.Length == 0) return null;
+            var value = MachineKey.Protect(data, MachineKeyPurpose);
+            return Convert.ToBase64String(value);
+        }
+
+        byte[] Unprotect(string value)
+        {
+            if (String.IsNullOrWhiteSpace(value)) return null;
+            var bytes = Convert.FromBase64String(value);
+            return MachineKey.Unprotect(bytes, MachineKeyPurpose);
         }
     }
 }
