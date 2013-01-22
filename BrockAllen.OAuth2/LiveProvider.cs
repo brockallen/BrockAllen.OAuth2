@@ -9,14 +9,22 @@ namespace BrockAllen.OAuth2
 {
     class LiveProvider : Provider
     {
-        public LiveProvider(string clientID, string clientSecret)
+        public LiveProvider(string clientID, string clientSecret, string scope)
             : base(ProviderType.Live,
-                "wl.signin%20wl.basic",
                 "https://login.live.com/oauth20_authorize.srf",
                 "https://login.live.com/oauth20_token.srf",
                 "https://apis.live.net/v5.0/me", 
                 clientID, clientSecret)
         {
+
+            if (string.IsNullOrEmpty(scope))
+            {
+                Scope = "wl.signin%20wl.basic";
+            }
+            else
+            {
+                Scope = scope;
+            }
         }
 
         static Dictionary<string, string> supportedClaimTypes = new Dictionary<string, string>();

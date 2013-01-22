@@ -10,14 +10,21 @@ namespace BrockAllen.OAuth2
 {
     class FacebookProvider : Provider
     {
-        public FacebookProvider(string clientID, string clientSecret)
-            : base(ProviderType.Facebook,
-                "",
+        public FacebookProvider(string clientID, string clientSecret, string scope)
+            : base(ProviderType.Facebook,                
                 "https://www.facebook.com/dialog/oauth",
                 "https://graph.facebook.com/oauth/access_token",
                 "https://graph.facebook.com/me",
                 clientID, clientSecret)
         {
+            if (string.IsNullOrEmpty(scope))
+            {
+                Scope = "";
+            }
+            else
+            {
+                Scope = scope;
+            }
         }
 
         static Dictionary<string, string> supportedClaimTypes = new Dictionary<string, string>();
