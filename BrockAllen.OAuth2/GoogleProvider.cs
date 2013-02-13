@@ -20,7 +20,7 @@ namespace BrockAllen.OAuth2
         {
             if (string.IsNullOrEmpty(scope))
             {
-                Scope = "https://www.googleapis.com/auth/userinfo.profile";
+                Scope = "https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email";
             }
             else
             {
@@ -38,6 +38,8 @@ namespace BrockAllen.OAuth2
             supportedClaimTypes.Add("given_name", ClaimTypes.GivenName);
             supportedClaimTypes.Add("family_name", ClaimTypes.Surname);
             supportedClaimTypes.Add("gender", ClaimTypes.Gender);
+            supportedClaimTypes.Add("link", ClaimTypes.Webpage);
+            supportedClaimTypes.Add("locale", ClaimTypes.Locality);
         }
         
         internal override Dictionary<string, string> SupportedClaimTypes

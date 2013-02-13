@@ -19,7 +19,7 @@ namespace BrockAllen.OAuth2
         {
             if (string.IsNullOrEmpty(scope))
             {
-                Scope = "";
+                Scope = "email";
             }
             else
             {
@@ -35,6 +35,10 @@ namespace BrockAllen.OAuth2
             supportedClaimTypes.Add("first_name", ClaimTypes.GivenName);
             supportedClaimTypes.Add("last_name", ClaimTypes.Surname);
             supportedClaimTypes.Add("gender", ClaimTypes.Gender);
+            supportedClaimTypes.Add("link", ClaimTypes.Webpage);
+            supportedClaimTypes.Add("birthday", ClaimTypes.DateOfBirth);
+            supportedClaimTypes.Add("locale", ClaimTypes.Locality);
+            supportedClaimTypes.Add("email", ClaimTypes.Email);
         }
         
         internal override Dictionary<string, string> SupportedClaimTypes
