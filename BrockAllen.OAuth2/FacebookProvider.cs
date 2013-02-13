@@ -17,7 +17,7 @@ namespace BrockAllen.OAuth2
                 "https://graph.facebook.com/me",
                 clientID, clientSecret)
         {
-            if (string.IsNullOrEmpty(scope))
+            if (scope == null)
             {
                 Scope = "email";
             }

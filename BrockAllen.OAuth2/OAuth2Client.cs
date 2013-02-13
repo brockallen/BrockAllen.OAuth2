@@ -44,7 +44,7 @@ namespace BrockAllen.OAuth2
 
         ConcurrentDictionary<ProviderType, Provider> providers = new ConcurrentDictionary<ProviderType, Provider>();
 
-        public void RegisterProvider(ProviderType providerType, string clientID, string clientSecret, string scope = "")
+        public void RegisterProvider(ProviderType providerType, string clientID, string clientSecret, string scope = null)
         {
             Provider provider = null;
             switch (providerType)

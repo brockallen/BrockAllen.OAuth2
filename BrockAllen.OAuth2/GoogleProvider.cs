@@ -18,7 +18,7 @@ namespace BrockAllen.OAuth2
                 "https://www.googleapis.com/oauth2/v1/userinfo",
                 clientID, clientSecret)
         {
-            if (string.IsNullOrEmpty(scope))
+            if (scope == null)
             {
                 Scope = "https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email";
             }

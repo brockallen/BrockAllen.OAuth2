@@ -16,8 +16,7 @@ namespace BrockAllen.OAuth2
                 "https://apis.live.net/v5.0/me", 
                 clientID, clientSecret)
         {
-
-            if (string.IsNullOrEmpty(scope))
+            if (scope == null)
             {
                 Scope = "wl.signin%20wl.basic wl.emails";
             }
