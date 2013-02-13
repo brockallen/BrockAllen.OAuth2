@@ -9,14 +9,24 @@ namespace BrockAllen.OAuth2
 {
     class GoogleProvider : Provider
     {
-        public GoogleProvider(string clientID, string clientSecret)
-            : base(ProviderType.Google,
-                "https://www.googleapis.com/auth/userinfo.profile",
+
+
+        public GoogleProvider(string clientID, string clientSecret, string scope)
+            : base(ProviderType.Google,                
                 "https://accounts.google.com/o/oauth2/auth",
                 "https://accounts.google.com/o/oauth2/token",
                 "https://www.googleapis.com/oauth2/v1/userinfo",
                 clientID, clientSecret)
         {
+            if (string.IsNullOrEmpty(scope))
+            {
+                Scope = "https://www.googleapis.com/auth/userinfo.profile";
+            }
+            else
+            {
+                Scope = scope;
+            }
+
         }
 
         static Dictionary<string, string> supportedClaimTypes = new Dictionary<string, string>();
