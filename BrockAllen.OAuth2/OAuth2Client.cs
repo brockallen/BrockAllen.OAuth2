@@ -37,7 +37,7 @@ namespace BrockAllen.OAuth2
         private OAuth2Client()
         {
         }
-        public OAuth2Client(ProviderType providerType, string clientID, string clientSecret, string scope = "")
+        public OAuth2Client(ProviderType providerType, string clientID, string clientSecret, string scope = null)
         {
             this.RegisterProvider(providerType, clientID, clientSecret, scope);
         }
