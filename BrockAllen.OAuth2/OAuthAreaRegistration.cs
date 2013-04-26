@@ -43,7 +43,7 @@ namespace BrockAllen.OAuth2
                     
                     OAuth2Client.Instance.RegisterProvider(type,
                                 provider.First(k => k.key[2].ToLower() == "clientid").value,
-                                provider.First(k => k.key[2].ToLower() == "clientsecred").value,
+                                provider.First(k => k.key[2].ToLower() == "clientsecret").value,
                                 scope==null || String.IsNullOrEmpty(scope.value) ?  null : scope.value); 
                     } catch
                     {
