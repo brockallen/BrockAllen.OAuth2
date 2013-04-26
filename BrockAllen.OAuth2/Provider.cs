@@ -34,12 +34,11 @@ namespace BrockAllen.OAuth2
         public string ClientSecret { get; set; }
 
         public Provider(
-            ProviderType type, string scope, 
+            ProviderType type, 
             string authorizationUrl, string tokenUrl, string profileUrl, 
             string clientID, string clientSecret)
         {
             this.ProviderType = type;
-            this.Scope = scope;
             this.AuthorizationUrl = authorizationUrl;
             this.TokenUrl = tokenUrl;
             this.ProfileUrl = profileUrl;

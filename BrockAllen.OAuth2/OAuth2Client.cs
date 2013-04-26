@@ -37,26 +37,26 @@ namespace BrockAllen.OAuth2
         private OAuth2Client()
         {
         }
-        public OAuth2Client(ProviderType providerType, string clientID, string clientSecret)
+        public OAuth2Client(ProviderType providerType, string clientID, string clientSecret, string scope = null)
         {
-            this.RegisterProvider(providerType, clientID, clientSecret);
+            this.RegisterProvider(providerType, clientID, clientSecret, scope);
         }
 
         ConcurrentDictionary<ProviderType, Provider> providers = new ConcurrentDictionary<ProviderType, Provider>();
 
-        public void RegisterProvider(ProviderType providerType, string clientID, string clientSecret)
+        public void RegisterProvider(ProviderType providerType, string clientID, string clientSecret, string scope = null)
         {
             Provider provider = null;
             switch (providerType)
             {
                 case ProviderType.Google:
-                    provider = new GoogleProvider(clientID, clientSecret);
+                    provider = new GoogleProvider(clientID, clientSecret, scope);
                     break;
                 case ProviderType.Live:
-                    provider = new LiveProvider(clientID, clientSecret);
+                    provider = new LiveProvider(clientID, clientSecret, scope);
                     break;
                 case ProviderType.Facebook:
-                    provider = new FacebookProvider(clientID, clientSecret);
+                    provider = new FacebookProvider(clientID, clientSecret, scope);
                     break;
             }
 
