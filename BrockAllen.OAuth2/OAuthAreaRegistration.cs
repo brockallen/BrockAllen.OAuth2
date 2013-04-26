@@ -39,11 +39,12 @@ namespace BrockAllen.OAuth2
                                         ProviderType.Live  ;
 
                     var scope = provider.FirstOrDefault(k => k.key[2].ToLower() == "scope");
+
                     
                     OAuth2Client.Instance.RegisterProvider(type,
-                                provider.First(k => k.key[2].ToLower() == "clientsd").value,
+                                provider.First(k => k.key[2].ToLower() == "clientid").value,
                                 provider.First(k => k.key[2].ToLower() == "clientsecred").value,
-                                scope==null ?  null : scope.value); 
+                                scope==null || String.IsNullOrEmpty(scope.value) ?  null : scope.value); 
                     } catch
                     {
                         //Not adding
