@@ -12,6 +12,11 @@ namespace BrockAllen.OAuth2
         string returnUrl;
         OAuth2Client client;
 
+        public OAuth2ActionResult(ProviderType type)
+            : this(OAuth2Client.Instance, type, null)
+        {
+        }
+        
         public OAuth2ActionResult(ProviderType type, string returnUrl)
             : this(OAuth2Client.Instance, type, returnUrl)
         {
