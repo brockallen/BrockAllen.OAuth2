@@ -15,8 +15,6 @@ namespace BrockAllen.OAuth2
 {
     abstract class Provider
     {
-        internal const string IdentityProviderClaimType = "http://schemas.microsoft.com/accesscontrolservice/2010/07/claims/identityprovider";
-
         public ProviderType ProviderType { get; set; }
         public string Name
         {
@@ -201,7 +199,7 @@ namespace BrockAllen.OAuth2
 
             var authInstantClaim = new Claim(ClaimTypes.AuthenticationInstant, DateTime.UtcNow.ToString("s"), ClaimValueTypes.DateTime, this.Name);
             claims.Insert(0, authInstantClaim);
-            var idpClaim = new Claim(IdentityProviderClaimType, this.Name, ClaimValueTypes.String, this.Name);
+            var idpClaim = new Claim(Constants.ClaimTypes.IdentityProvider, this.Name, ClaimValueTypes.String, this.Name);
             claims.Insert(0, idpClaim);
             
             return new CallbackResult { Claims = claims.ToArray() };
