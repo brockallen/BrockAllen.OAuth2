@@ -21,19 +21,25 @@ namespace BrockAllen.OAuth2
             }
 
             var sam = FederatedAuthentication.SessionAuthenticationModule;
-            if (sam != null)
-            {
-                var cp = new ClaimsPrincipal(new ClaimsIdentity(result.Claims, "OAuth"));
-                var transformer = FederatedAuthentication.FederationConfiguration.IdentityConfiguration.ClaimsAuthenticationManager;
-                if (transformer != null)
-                {
-                    cp = transformer.Authenticate(String.Empty, cp);
-                }
-                var token = new SessionSecurityToken(cp);
-                sam.WriteSessionTokenToCookie(token);
-            }
+            if (sam == null) throw new Exception("SessionAuthenticationModule not registered.");
 
-            return Redirect(result.ReturnUrl);
+            var cp = new ClaimsPrincipal(new ClaimsIdentity(result.Claims, "OAuth"));
+            var transformer = FederatedAuthentication.FederationConfiguration.IdentityConfiguration.ClaimsAuthenticationManager;
+            if (transformer != null)
+            {
+                cp = transformer.Authenticate(String.Empty, cp);
+            }
+            var token = new SessionSecurityToken(cp);
+            sam.WriteSessionTokenToCookie(token);
+
+            if (!String.IsNullOrWhiteSpace(result.ReturnUrl))
+            {
+                return Redirect(result.ReturnUrl);
+            }
+            else
+            {
+                return Redirect("~");
+            }
         }
     }
 }
