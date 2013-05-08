@@ -96,7 +96,7 @@ namespace BrockAllen.OAuth2
             string error = queryString["error"];
             if (!String.IsNullOrWhiteSpace(error))
             {
-                return new AuthorizationToken { Error = "State does not match." };
+                return new AuthorizationToken { Error = error };
             }
 
             string state = queryString["state"];
