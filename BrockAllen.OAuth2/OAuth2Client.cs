@@ -11,7 +11,9 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web;
+using System.Web.Routing;
 using System.Web.Security;
+using System.Web.Mvc;
 
 namespace BrockAllen.OAuth2
 {
@@ -40,6 +42,14 @@ namespace BrockAllen.OAuth2
         public OAuth2Client(ProviderType providerType, string clientID, string clientSecret, string scope = null)
         {
             this.RegisterProvider(providerType, clientID, clientSecret, scope);
+        }
+
+        public static void RegisterCustomOAuthCallback(RouteCollection routes, string action, string controller, string area = null)
+        {
+            routes.MapRoute(
+                "OAuthCallback", 
+                OAuth2Client.OAuthCallbackUrl, 
+                new { controller, action, area });
         }
 
         ConcurrentDictionary<ProviderType, Provider> providers = new ConcurrentDictionary<ProviderType, Provider>();
