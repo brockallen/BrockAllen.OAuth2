@@ -194,14 +194,7 @@ namespace BrockAllen.OAuth2
                     ErrorDetails = token.ErrorDetails
                 };
             }
-            var result = await this.GetProfileClaimsAsync(token);
-            var claims = result.ToList();
-
-            var authInstantClaim = new Claim(ClaimTypes.AuthenticationInstant, DateTime.UtcNow.ToString("s"), ClaimValueTypes.DateTime, this.Name);
-            claims.Insert(0, authInstantClaim);
-            var idpClaim = new Claim(Constants.ClaimTypes.IdentityProvider, this.Name, ClaimValueTypes.String, this.Name);
-            claims.Insert(0, idpClaim);
-            
+            var claims = await this.GetProfileClaimsAsync(token);
             return new CallbackResult { Claims = claims.ToArray() };
         }
     }

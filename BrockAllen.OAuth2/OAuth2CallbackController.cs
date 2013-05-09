@@ -24,6 +24,13 @@ namespace BrockAllen.OAuth2
             if (sam == null) throw new Exception("SessionAuthenticationModule not registered.");
 
             var cp = new ClaimsPrincipal(new ClaimsIdentity(result.Claims, "OAuth"));
+            
+            var id = cp.Identities.First();
+            var authInstantClaim = new Claim(ClaimTypes.AuthenticationInstant, DateTime.UtcNow.ToString("s"));
+            id.AddClaim(authInstantClaim);
+            var idpClaim = new Claim(Constants.ClaimTypes.IdentityProvider, result.ProviderName);
+            id.AddClaim(idpClaim);
+
             var transformer = FederatedAuthentication.FederationConfiguration.IdentityConfiguration.ClaimsAuthenticationManager;
             if (transformer != null)
             {
