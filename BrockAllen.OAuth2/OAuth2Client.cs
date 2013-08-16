@@ -19,6 +19,7 @@ namespace BrockAllen.OAuth2
 {
     public class OAuth2Client
     {
+        public static Uri OAuthCallbackOrigin { get; set; }
         public static string OAuthCallbackUrl { get; set; }
         public static bool AutoRegisterOAuthCallbackUrl { get; set; }
         public static string AuthorizationContextCookieName { get; set; }

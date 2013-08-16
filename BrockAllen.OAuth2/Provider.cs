@@ -49,9 +49,17 @@ namespace BrockAllen.OAuth2
             get
             {
                 var ctx = System.Web.HttpContext.Current;
+                var origin = OAuth2Client.OAuthCallbackOrigin;
+                
+                if (origin == null)
+                {
+                    origin = ctx.Request.Url;
+                }
+                
                 var app = ctx.Request.ApplicationPath;
                 if (!app.EndsWith("/")) app += "/";
-                var url = new Uri(ctx.Request.Url, app + OAuth2Client.OAuthCallbackUrl);
+                
+                var url = new Uri(origin, app + OAuth2Client.OAuthCallbackUrl);
                 return url.AbsoluteUri;
             }
         }
