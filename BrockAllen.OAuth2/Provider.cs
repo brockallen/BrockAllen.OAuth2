@@ -170,13 +170,13 @@ namespace BrockAllen.OAuth2
         protected async virtual Task<IEnumerable<Claim>> GetProfileClaimsAsync(AuthorizationToken token)
         {
             var url = this.ProfileUrl + "?" + this.accessTokenParameterName + "=" + token.AccessToken;
-            
+
             //add additional params
             if (additionalParams != null)
             {
-                foreach (KeyValuePair<string, string> param in additionalParams)
+                foreach (string key in additionalParams)
                 {
-                    url += string.Format("&{0}={1}", param.Key, param.Value);
+                    url += string.Format("&{0}={1}", key, additionalParams[key]);
                 }
             }
 
