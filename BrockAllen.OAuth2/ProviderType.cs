@@ -8,6 +8,6 @@ namespace BrockAllen.OAuth2
 {
     public enum ProviderType
     {
-        Google, Live, Facebook
+        Google, Live, Facebook, LinkedIn
     }
 }

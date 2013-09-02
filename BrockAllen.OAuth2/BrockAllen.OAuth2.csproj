@@ -83,6 +83,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Constants.cs" />
+    <Compile Include="LinkedInProvider.cs" />
     <Compile Include="OAuth2Client.cs" />
     <Compile Include="Provider.cs" />
     <Compile Include="ProviderType.cs" />

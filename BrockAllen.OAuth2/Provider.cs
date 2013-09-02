@@ -27,14 +27,16 @@ namespace BrockAllen.OAuth2
         public string AuthorizationUrl { get; set; }
         public string TokenUrl { get; set; }
         public string ProfileUrl { get; set; }
+        public string accessTokenParameterName { get; set; }
+        public NameValueCollection additionalParams { get; set; }
 
         public string ClientID { get; set; }
         public string ClientSecret { get; set; }
 
         public Provider(
-            ProviderType type, 
-            string authorizationUrl, string tokenUrl, string profileUrl, 
-            string clientID, string clientSecret)
+            ProviderType type,
+            string authorizationUrl, string tokenUrl, string profileUrl,
+            string clientID, string clientSecret, string accessTokenParameterName = "access_token", NameValueCollection additionalParams = null)
         {
             this.ProviderType = type;
             this.AuthorizationUrl = authorizationUrl;
@@ -42,6 +44,8 @@ namespace BrockAllen.OAuth2
             this.ProfileUrl = profileUrl;
             this.ClientID = clientID;
             this.ClientSecret = clientSecret;
+            this.accessTokenParameterName = accessTokenParameterName;
+            this.additionalParams = additionalParams;
         }
 
         string RedirectUrl
@@ -165,8 +169,17 @@ namespace BrockAllen.OAuth2
 
         protected async virtual Task<IEnumerable<Claim>> GetProfileClaimsAsync(AuthorizationToken token)
         {
-            var url = this.ProfileUrl + "?access_token=" + token.AccessToken;
-            
+            var url = this.ProfileUrl + "?" + this.accessTokenParameterName + "=" + token.AccessToken;
+
+            //add additional params
+            if (additionalParams != null)
+            {
+                foreach (string key in additionalParams)
+                {
+                    url += string.Format("&{0}={1}", key, additionalParams[key]);
+                }
+            }
+
             HttpClient client = new HttpClient();
             var result = await client.GetAsync(url);
             if (result.IsSuccessStatusCode)
