@@ -27,6 +27,8 @@ namespace BrockAllen.OAuth2
         public string AuthorizationUrl { get; set; }
         public string TokenUrl { get; set; }
         public string ProfileUrl { get; set; }
+        public string accessTokenParameterName { get; set; }
+        public string additionalParams { get; set; }
 
         public string ClientID { get; set; }
         public string ClientSecret { get; set; }
@@ -34,7 +36,7 @@ namespace BrockAllen.OAuth2
         public Provider(
             ProviderType type, 
             string authorizationUrl, string tokenUrl, string profileUrl, 
-            string clientID, string clientSecret)
+            string clientID, string clientSecret, string accessTokenParameterName="access_token", string additionalParams="")
         {
             this.ProviderType = type;
             this.AuthorizationUrl = authorizationUrl;
@@ -42,6 +44,8 @@ namespace BrockAllen.OAuth2
             this.ProfileUrl = profileUrl;
             this.ClientID = clientID;
             this.ClientSecret = clientSecret;
+            this.accessTokenParameterName = accessTokenParameterName;
+            this.additionalParams = additionalParams;
         }
 
         string RedirectUrl
@@ -165,8 +169,9 @@ namespace BrockAllen.OAuth2
 
         protected async virtual Task<IEnumerable<Claim>> GetProfileClaimsAsync(AuthorizationToken token)
         {
-            var url = this.ProfileUrl + "?access_token=" + token.AccessToken;
-            
+            var url = this.ProfileUrl + "?" + this.accessTokenParameterName + "=" + token.AccessToken;
+            url = new StringBuilder(url).Append(this.additionalParams).ToString();
+
             HttpClient client = new HttpClient();
             var result = await client.GetAsync(url);
             if (result.IsSuccessStatusCode)

@@ -32,6 +32,10 @@ namespace OAuth2ClientWebApp.Controllers
                 ProviderType.Live, 
                 "00000000400DF045",
                 "4L08bE3WM8Ra4rRNMv3N--un5YOBr4gx");
+            OAuth2Client.Instance.RegisterProvider(
+                ProviderType.LinkedIn,
+                "",
+                "");
         }
 
         public ActionResult Index()
