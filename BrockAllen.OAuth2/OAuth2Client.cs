@@ -58,6 +58,9 @@ namespace BrockAllen.OAuth2
                 case ProviderType.Facebook:
                     provider = new FacebookProvider(clientID, clientSecret, scope);
                     break;
+                case ProviderType.LinkedIn:
+                    provider = new LinkedInProvider(clientID, clientSecret, scope);
+                    break;
             }
 
             if (provider == null)
