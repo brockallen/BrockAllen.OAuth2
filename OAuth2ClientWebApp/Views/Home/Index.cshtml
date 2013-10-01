@@ -7,6 +7,7 @@
     <li>@Html.ActionLink("Google", "Login", new { type = BrockAllen.OAuth2.ProviderType.Google })</li>
     <li>@Html.ActionLink("Live", "Login", new { type = BrockAllen.OAuth2.ProviderType.Live})</li>
     <li>@Html.ActionLink("Facebook", "Login", new { type = BrockAllen.OAuth2.ProviderType.Facebook})</li>
+    <li>@Html.ActionLink("LinkedIn","Login", new { type = BrockAllen.OAuth2.ProviderType.LinkedIn})</li>
 </ul>
 @{
     var id = System.Security.Claims.ClaimsPrincipal.Current;
