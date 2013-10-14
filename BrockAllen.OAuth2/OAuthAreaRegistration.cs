@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Configuration;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -24,26 +25,27 @@ namespace BrockAllen.OAuth2
                     OAuth2Client.OAuthCallbackUrl,
                     new { controller = "OAuth2Callback", action = "Callback" });
 
-                var settings = System.Web.Configuration.WebConfigurationManager.AppSettings;
+                var settings = ConfigurationManager.AppSettings;
                 var providers = from v in
                                     (from string q in settings.Keys
                                      where q.StartsWith("oauth2:")
-                                     select new { key = q.Split(':'), value = settings[q] })
-                                group v by v.key[1];
+                                     let parts = q.Split(':')
+                                     where parts.Length == 3
+                                     select new { provider=parts[1], key = parts[2], value=settings[q] })
+                                group v by v.provider;
                 foreach (var provider in providers)
                 {
                     try
                     {
-                        ProviderType type = provider.Key == "facebook" ? ProviderType.Facebook :
-                                            provider.Key == "google" ? ProviderType.Google :
-                                            ProviderType.Live;
-
-                        var scope = provider.FirstOrDefault(k => k.key[2].ToLower() == "scope");
-
-                        OAuth2Client.Instance.RegisterProvider(type,
-                                    provider.First(k => k.key[2].ToLower() == "clientid").value,
-                                    provider.First(k => k.key[2].ToLower() == "clientsecret").value,
-                                    scope == null || String.IsNullOrEmpty(scope.value) ? null : scope.value);
+                        var type = (ProviderType)Enum.Parse(typeof(ProviderType), provider.Key, true);
+                        var clientID = provider.Where(x => x.key.Equals("clientID", StringComparison.OrdinalIgnoreCase)).Select(x => x.value).SingleOrDefault();
+                        var clientSecret = provider.Where(x => x.key.Equals("clientSecret", StringComparison.OrdinalIgnoreCase)).Select(x => x.value).SingleOrDefault();
+                        var scope = provider.Where(k => k.key.Equals("scope", StringComparison.OrdinalIgnoreCase)).Select(x=>x.value).SingleOrDefault();
+                        
+                        if (!String.IsNullOrWhiteSpace(clientID) && !String.IsNullOrWhiteSpace(clientSecret))
+                        {
+                            OAuth2Client.Instance.RegisterProvider(type, clientID, clientSecret, scope);
+                        }
                     }
                     catch
                     {
