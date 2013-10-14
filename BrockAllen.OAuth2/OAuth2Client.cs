@@ -11,12 +11,15 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web;
+using System.Web.Routing;
 using System.Web.Security;
+using System.Web.Mvc;
 
 namespace BrockAllen.OAuth2
 {
     public class OAuth2Client
     {
+        public static Uri OAuthCallbackOrigin { get; set; }
         public static string OAuthCallbackUrl { get; set; }
         public static bool AutoRegisterOAuthCallbackUrl { get; set; }
         public static string AuthorizationContextCookieName { get; set; }
@@ -42,6 +45,14 @@ namespace BrockAllen.OAuth2
             this.RegisterProvider(providerType, clientID, clientSecret, scope);
         }
 
+        public static void RegisterCustomOAuthCallback(RouteCollection routes, string action, string controller, string area = null)
+        {
+            routes.MapRoute(
+                "OAuthCallback", 
+                OAuth2Client.OAuthCallbackUrl, 
+                new { controller, action, area });
+        }
+
         ConcurrentDictionary<ProviderType, Provider> providers = new ConcurrentDictionary<ProviderType, Provider>();
 
         public void RegisterProvider(ProviderType providerType, string clientID, string clientSecret, string scope = null)
@@ -57,6 +68,9 @@ namespace BrockAllen.OAuth2
                     break;
                 case ProviderType.Facebook:
                     provider = new FacebookProvider(clientID, clientSecret, scope);
+                    break;
+                case ProviderType.LinkedIn:
+                    provider = new LinkedInProvider(clientID, clientSecret, scope);
                     break;
             }
 

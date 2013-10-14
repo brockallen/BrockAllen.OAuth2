@@ -15,8 +15,6 @@ namespace BrockAllen.OAuth2
 {
     abstract class Provider
     {
-        internal const string IdentityProviderClaimType = "http://schemas.microsoft.com/accesscontrolservice/2010/07/claims/identityprovider";
-
         public ProviderType ProviderType { get; set; }
         public string Name
         {
@@ -29,14 +27,16 @@ namespace BrockAllen.OAuth2
         public string AuthorizationUrl { get; set; }
         public string TokenUrl { get; set; }
         public string ProfileUrl { get; set; }
+        public string accessTokenParameterName { get; set; }
+        public NameValueCollection additionalParams { get; set; }
 
         public string ClientID { get; set; }
         public string ClientSecret { get; set; }
 
         public Provider(
-            ProviderType type, 
-            string authorizationUrl, string tokenUrl, string profileUrl, 
-            string clientID, string clientSecret)
+            ProviderType type,
+            string authorizationUrl, string tokenUrl, string profileUrl,
+            string clientID, string clientSecret, string accessTokenParameterName = "access_token", NameValueCollection additionalParams = null)
         {
             this.ProviderType = type;
             this.AuthorizationUrl = authorizationUrl;
@@ -44,6 +44,8 @@ namespace BrockAllen.OAuth2
             this.ProfileUrl = profileUrl;
             this.ClientID = clientID;
             this.ClientSecret = clientSecret;
+            this.accessTokenParameterName = accessTokenParameterName;
+            this.additionalParams = additionalParams;
         }
 
         string RedirectUrl
@@ -51,9 +53,17 @@ namespace BrockAllen.OAuth2
             get
             {
                 var ctx = System.Web.HttpContext.Current;
+                var origin = OAuth2Client.OAuthCallbackOrigin;
+                
+                if (origin == null)
+                {
+                    origin = ctx.Request.Url;
+                }
+                
                 var app = ctx.Request.ApplicationPath;
                 if (!app.EndsWith("/")) app += "/";
-                var url = new Uri(ctx.Request.Url, app + OAuth2Client.OAuthCallbackUrl);
+                
+                var url = new Uri(origin, app + OAuth2Client.OAuthCallbackUrl);
                 return url.AbsoluteUri;
             }
         }
@@ -96,7 +106,7 @@ namespace BrockAllen.OAuth2
             string error = queryString["error"];
             if (!String.IsNullOrWhiteSpace(error))
             {
-                return new AuthorizationToken { Error = "State does not match." };
+                return new AuthorizationToken { Error = error };
             }
 
             string state = queryString["state"];
@@ -159,8 +169,17 @@ namespace BrockAllen.OAuth2
 
         protected async virtual Task<IEnumerable<Claim>> GetProfileClaimsAsync(AuthorizationToken token)
         {
-            var url = this.ProfileUrl + "?access_token=" + token.AccessToken;
-            
+            var url = this.ProfileUrl + "?" + this.accessTokenParameterName + "=" + token.AccessToken;
+
+            //add additional params
+            if (additionalParams != null)
+            {
+                foreach (string key in additionalParams)
+                {
+                    url += string.Format("&{0}={1}", key, additionalParams[key]);
+                }
+            }
+
             HttpClient client = new HttpClient();
             var result = await client.GetAsync(url);
             if (result.IsSuccessStatusCode)
@@ -196,14 +215,7 @@ namespace BrockAllen.OAuth2
                     ErrorDetails = token.ErrorDetails
                 };
             }
-            var result = await this.GetProfileClaimsAsync(token);
-            var claims = result.ToList();
-
-            var authInstantClaim = new Claim(ClaimTypes.AuthenticationInstant, DateTime.UtcNow.ToString("s"), ClaimValueTypes.DateTime, this.Name);
-            claims.Insert(0, authInstantClaim);
-            var idpClaim = new Claim(IdentityProviderClaimType, this.Name, ClaimValueTypes.String, this.Name);
-            claims.Insert(0, idpClaim);
-            
+            var claims = await this.GetProfileClaimsAsync(token);
             return new CallbackResult { Claims = claims.ToArray() };
         }
     }
