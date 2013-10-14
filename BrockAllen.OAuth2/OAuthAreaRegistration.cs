@@ -34,26 +34,22 @@ namespace BrockAllen.OAuth2
                 {
                     try
                     {
-                    ProviderType type = provider.Key == "facebook" ? ProviderType.Facebook :
-                                        provider.Key == "google" ? ProviderType.Google :
-                                        ProviderType.Live  ;
+                        ProviderType type = provider.Key == "facebook" ? ProviderType.Facebook :
+                                            provider.Key == "google" ? ProviderType.Google :
+                                            ProviderType.Live;
 
-                    var scope = provider.FirstOrDefault(k => k.key[2].ToLower() == "scope");
+                        var scope = provider.FirstOrDefault(k => k.key[2].ToLower() == "scope");
 
-                    
-                    OAuth2Client.Instance.RegisterProvider(type,
-                                provider.First(k => k.key[2].ToLower() == "clientid").value,
-                                provider.First(k => k.key[2].ToLower() == "clientsecret").value,
-                                scope==null || String.IsNullOrEmpty(scope.value) ?  null : scope.value); 
-                    } catch
+                        OAuth2Client.Instance.RegisterProvider(type,
+                                    provider.First(k => k.key[2].ToLower() == "clientid").value,
+                                    provider.First(k => k.key[2].ToLower() == "clientsecret").value,
+                                    scope == null || String.IsNullOrEmpty(scope.value) ? null : scope.value);
+                    }
+                    catch
                     {
                         //Not adding
                     }
                 }
-
-                                
-
-                
             }
         }
     }
