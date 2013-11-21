@@ -17,7 +17,15 @@ namespace OAuth2ClientWebApp
     {
         protected void Application_Start()
         {
-            OAuth2Client.AutoRegisterOAuthCallbackUrl = true;
+            if (Config.UseCustomCallback)
+            {
+                OAuth2Client.OAuthCallbackUrl = "Home/Callback";
+            }
+            else
+            {
+                OAuth2Client.AutoRegisterOAuthCallbackUrl = true;
+            }
+
             AreaRegistration.RegisterAllAreas();
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
             RouteConfig.RegisterRoutes(RouteTable.Routes);

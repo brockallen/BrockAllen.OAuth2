@@ -1,11 +1,14 @@
 ﻿using BrockAllen.OAuth2;
 using System;
 using System.Collections.Generic;
+using System.IdentityModel.Services;
+using System.IdentityModel.Tokens;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
+
 
 namespace OAuth2ClientWebApp.Controllers
 {
@@ -49,7 +52,39 @@ namespace OAuth2ClientWebApp.Controllers
         {
             // 1st param is which OAuth2 provider to use
             // 2nd param is what URL to send the user once all the login magic is done
-            return new OAuth2ActionResult(type, Url.Action("Index"));
+            if (Config.UseCustomCallback)
+            {
+                return new OAuth2ActionResult(type);
+            }
+            else
+            {
+                return new OAuth2ActionResult(type, Url.Action("Index"));
+            }
+        }
+
+        public async Task<ActionResult> Callback()
+        {
+            var result = await OAuth2Client.Instance.ProcessCallbackAsync();
+            if (result.Error != null)
+            {
+                return Content(result.Error + "<br>" + result.ErrorDetails);
+            }
+
+            var sam = FederatedAuthentication.SessionAuthenticationModule;
+            if (sam == null) throw new Exception("SessionAuthenticationModule not registered.");
+
+            var cp = new ClaimsPrincipal(new ClaimsIdentity(result.Claims, "OAuth"));
+
+            var id = cp.Identities.First();
+            var authInstantClaim = new Claim(ClaimTypes.AuthenticationInstant, DateTime.UtcNow.ToString("s"));
+            id.AddClaim(authInstantClaim);
+            var idpClaim = new Claim(Constants.ClaimTypes.IdentityProvider, result.ProviderName);
+            id.AddClaim(idpClaim);
+
+            var token = new SessionSecurityToken(cp);
+            sam.WriteSessionTokenToCookie(token);
+
+            return RedirectToAction("Index");
         }
     }
 }
