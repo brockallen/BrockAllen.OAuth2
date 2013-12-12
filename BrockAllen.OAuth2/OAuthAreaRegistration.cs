@@ -37,7 +37,7 @@ namespace BrockAllen.OAuth2
                 {
                     try
                     {
-                        var type = (ProviderType)Enum.Parse(typeof(ProviderType), provider.Key, true);
+                        var type = provider.Key;
                         var clientID = provider.Where(x => x.key.Equals("clientID", StringComparison.OrdinalIgnoreCase)).Select(x => x.value).SingleOrDefault();
                         var clientSecret = provider.Where(x => x.key.Equals("clientSecret", StringComparison.OrdinalIgnoreCase)).Select(x => x.value).SingleOrDefault();
                         var scope = provider.Where(k => k.key.Equals("scope", StringComparison.OrdinalIgnoreCase)).Select(x=>x.value).SingleOrDefault();

@@ -40,7 +40,7 @@ namespace BrockAllen.OAuth2
         private OAuth2Client()
         {
         }
-        public OAuth2Client(ProviderType providerType, string clientID, string clientSecret, string scope = null)
+        public OAuth2Client(string providerType, string clientID, string clientSecret, string scope = null)
         {
             this.RegisterProvider(providerType, clientID, clientSecret, scope);
         }
@@ -53,9 +53,9 @@ namespace BrockAllen.OAuth2
                 new { controller, action, area });
         }
 
-        ConcurrentDictionary<ProviderType, Provider> providers = new ConcurrentDictionary<ProviderType, Provider>();
+        ConcurrentDictionary<string, Provider> providers = new ConcurrentDictionary<string, Provider>();
 
-        public void RegisterProvider(ProviderType providerType, string clientID, string clientSecret, string scope = null)
+        public void RegisterProvider(string providerType, string clientID, string clientSecret, string scope = null)
         {
             Provider provider = null;
             switch (providerType)
@@ -74,15 +74,20 @@ namespace BrockAllen.OAuth2
                     break;
             }
 
+            RegisterProvider(provider);
+        }
+
+        public void RegisterProvider(Provider provider)
+        {
             if (provider == null)
             {
                 throw new ArgumentException("Invalid provider type");
             }
 
-            providers[providerType] = provider;
+            providers[provider.ProviderType] = provider;
         }
 
-        internal Provider GetProvider(ProviderType providerType)
+        internal Provider GetProvider(string providerType)
         {
             var provider = providers[providerType];
             if (provider == null)
@@ -93,7 +98,7 @@ namespace BrockAllen.OAuth2
         }
 
         public void RedirectToAuthorizationProvider(
-            ProviderType providerType, string returnUrl = null)
+            string providerType, string returnUrl = null)
         {
             var provider = this.GetProvider(providerType);
 

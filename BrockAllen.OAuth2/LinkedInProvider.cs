@@ -12,7 +12,7 @@ namespace BrockAllen.OAuth2
     class LinkedInProvider : Provider
     {
         public LinkedInProvider(string clientID, string clientSecret, string scope)
-            : base(ProviderType.LinkedIn,
+            : base("linkedin",
                 "https://www.linkedin.com/uas/oauth2/authorization",
                 "https://www.linkedin.com/uas/oauth2/accessToken",
                 "https://api.linkedin.com/v1/people/~:(id,first-name,last-name,email-address,picture-url,formatted-name,location:(country:(code)),public-profile-url)",
@@ -56,8 +56,8 @@ namespace BrockAllen.OAuth2
             supportedClaimTypes.Add("location", ClaimTypes.Locality);
             supportedClaimTypes.Add("pictureUrl", ClaimTypes.UserData);
         }
-        
-        internal override Dictionary<string, string> SupportedClaimTypes
+
+        protected override Dictionary<string, string> SupportedClaimTypes
         {
             get { return supportedClaimTypes; }
         }

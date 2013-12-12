@@ -48,7 +48,7 @@ namespace OAuth2ClientWebApp.Controllers
             return View();
         }
         
-        public ActionResult Login(ProviderType type)
+        public ActionResult Login(string type)
         {
             // 1st param is which OAuth2 provider to use
             // 2nd param is what URL to send the user once all the login magic is done

@@ -12,7 +12,7 @@ namespace BrockAllen.OAuth2
 
 
         public GoogleProvider(string clientID, string clientSecret, string scope)
-            : base(ProviderType.Google,                
+            : base("google",                
                 "https://accounts.google.com/o/oauth2/auth",
                 "https://accounts.google.com/o/oauth2/token",
                 "https://www.googleapis.com/oauth2/v1/userinfo",
@@ -42,7 +42,7 @@ namespace BrockAllen.OAuth2
             supportedClaimTypes.Add("locale", ClaimTypes.Locality);
         }
         
-        internal override Dictionary<string, string> SupportedClaimTypes
+        protected override Dictionary<string, string> SupportedClaimTypes
         {
             get { return supportedClaimTypes; }
         }
