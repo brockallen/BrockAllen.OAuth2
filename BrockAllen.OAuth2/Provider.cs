@@ -13,9 +13,9 @@ using Thinktecture.IdentityModel;
 
 namespace BrockAllen.OAuth2
 {
-    abstract class Provider
+    public abstract class Provider
     {
-        public ProviderType ProviderType { get; set; }
+        public string ProviderType { get; set; }
         public string Name
         {
             get
@@ -34,7 +34,7 @@ namespace BrockAllen.OAuth2
         public string ClientSecret { get; set; }
 
         public Provider(
-            ProviderType type,
+            string type,
             string authorizationUrl, string tokenUrl, string profileUrl,
             string clientID, string clientSecret, string accessTokenParameterName = "access_token", NameValueCollection additionalParams = null)
         {
@@ -68,7 +68,7 @@ namespace BrockAllen.OAuth2
             }
         }
 
-        internal abstract Dictionary<string, string> SupportedClaimTypes { get; }
+        protected abstract Dictionary<string, string> SupportedClaimTypes { get; }
 
         public AuthorizationRedirect GetRedirect()
         {
@@ -109,8 +109,9 @@ namespace BrockAllen.OAuth2
                 return new AuthorizationToken { Error = error };
             }
 
+            // state is RECOMMENDED but not REQUIRED
             string state = queryString["state"];
-            if (ctx.State != state)
+            if (state != null && ctx.State != state)
             {
                 return new AuthorizationToken { Error = "State does not match." };
             }

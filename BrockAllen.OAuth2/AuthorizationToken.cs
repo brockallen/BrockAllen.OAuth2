@@ -9,7 +9,7 @@ using System.Web.Security;
 
 namespace BrockAllen.OAuth2
 {
-    class AuthorizationToken
+    public class AuthorizationToken
     {
         public static AuthorizationToken FromJson(string json)
         {

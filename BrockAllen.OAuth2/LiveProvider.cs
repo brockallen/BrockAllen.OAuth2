@@ -10,7 +10,7 @@ namespace BrockAllen.OAuth2
     class LiveProvider : Provider
     {
         public LiveProvider(string clientID, string clientSecret, string scope)
-            : base(ProviderType.Live,
+            : base("live",
                 "https://login.live.com/oauth20_authorize.srf",
                 "https://login.live.com/oauth20_token.srf",
                 "https://apis.live.net/v5.0/me", 
@@ -38,7 +38,7 @@ namespace BrockAllen.OAuth2
             supportedClaimTypes.Add("locale", ClaimTypes.Locality);
         }
         
-        internal override Dictionary<string, string> SupportedClaimTypes
+        protected override Dictionary<string, string> SupportedClaimTypes
         {
             get { return supportedClaimTypes; }
         }

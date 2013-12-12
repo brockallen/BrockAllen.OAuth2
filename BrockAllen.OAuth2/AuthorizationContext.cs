@@ -8,9 +8,9 @@ using System.Threading.Tasks;
 
 namespace BrockAllen.OAuth2
 {
-    class AuthorizationContext
+    public class AuthorizationContext
     {
-        public ProviderType ProviderType { get; set; }
+        public string ProviderType { get; set; }
         public string ReturnUrl { get; set; }
         public string State { get; set; }
 

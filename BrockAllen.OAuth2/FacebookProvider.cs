@@ -11,7 +11,7 @@ namespace BrockAllen.OAuth2
     class FacebookProvider : Provider
     {
         public FacebookProvider(string clientID, string clientSecret, string scope)
-            : base(ProviderType.Facebook,                
+            : base("facebook",                
                 "https://www.facebook.com/dialog/oauth",
                 "https://graph.facebook.com/oauth/access_token",
                 "https://graph.facebook.com/me",
@@ -40,8 +40,8 @@ namespace BrockAllen.OAuth2
             supportedClaimTypes.Add("locale", ClaimTypes.Locality);
             supportedClaimTypes.Add("email", ClaimTypes.Email);
         }
-        
-        internal override Dictionary<string, string> SupportedClaimTypes
+
+        protected override Dictionary<string, string> SupportedClaimTypes
         {
             get { return supportedClaimTypes; }
         }

@@ -6,8 +6,12 @@ using System.Threading.Tasks;
 
 namespace BrockAllen.OAuth2
 {
-    public enum ProviderType
+    public class ProviderType
     {
-        Google, Live, Facebook, LinkedIn
+        public const string Google = "google";
+        public const string Live = "live";
+        public const string Facebook = "facebook";
+        public const string LinkedIn = "linkedin";
+        public const string MyAxpo = "myaxpo";
     }
 }
