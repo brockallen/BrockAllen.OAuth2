@@ -48,29 +48,29 @@ namespace BrockAllen.OAuth2
         public static void RegisterCustomOAuthCallback(RouteCollection routes, string action, string controller, string area = null)
         {
             routes.MapRoute(
-                "OAuthCallback", 
-                OAuth2Client.OAuthCallbackUrl, 
+                "OAuthCallback",
+                OAuth2Client.OAuthCallbackUrl,
                 new { controller, action, area });
         }
 
         ConcurrentDictionary<ProviderType, Provider> providers = new ConcurrentDictionary<ProviderType, Provider>();
 
-        public void RegisterProvider(ProviderType providerType, string clientID, string clientSecret, string scope = null)
+        public void RegisterProvider(ProviderType providerType, string clientID, string clientSecret, string scope = null, NameValueCollection additionalParameters = null)
         {
             Provider provider = null;
             switch (providerType)
             {
                 case ProviderType.Google:
-                    provider = new GoogleProvider(clientID, clientSecret, scope);
+                    provider = new GoogleProvider(clientID, clientSecret, scope, additionalParameters);
                     break;
                 case ProviderType.Live:
-                    provider = new LiveProvider(clientID, clientSecret, scope);
+                    provider = new LiveProvider(clientID, clientSecret, scope, additionalParameters);
                     break;
                 case ProviderType.Facebook:
-                    provider = new FacebookProvider(clientID, clientSecret, scope);
+                    provider = new FacebookProvider(clientID, clientSecret, scope, additionalParameters);
                     break;
                 case ProviderType.LinkedIn:
-                    provider = new LinkedInProvider(clientID, clientSecret, scope);
+                    provider = new LinkedInProvider(clientID, clientSecret, scope, additionalParameters);
                     break;
             }
 
@@ -100,8 +100,8 @@ namespace BrockAllen.OAuth2
             var redirect = provider.GetRedirect();
             var authCtx = new AuthorizationContext
             {
-                ProviderType = providerType, 
-                ReturnUrl = returnUrl, 
+                ProviderType = providerType,
+                ReturnUrl = returnUrl,
                 State = redirect.State
             };
             SaveContext(authCtx);
@@ -115,9 +115,9 @@ namespace BrockAllen.OAuth2
             var authCtx = GetContext();
             if (authCtx == null)
             {
-                return new CallbackResult 
-                { 
-                    Error = "No Authorization Context Cookie" 
+                return new CallbackResult
+                {
+                    Error = "No Authorization Context Cookie"
                 };
             }
             var provider = GetProvider(authCtx.ProviderType);
@@ -127,14 +127,14 @@ namespace BrockAllen.OAuth2
             result.ProviderName = authCtx.ProviderType.ToString();
             return result;
         }
-        
+
         void SaveContext(AuthorizationContext authCtx)
         {
             var ctx = HttpContext.Current;
-            
+
             var json = authCtx.ToJson();
             var data = Protect(Encoding.UTF8.GetBytes(json));
-            
+
             var cookie = new HttpCookie(AuthorizationContextCookieName, data);
             cookie.Secure = ctx.Request.IsSecureConnection;
             cookie.HttpOnly = true;
@@ -147,7 +147,7 @@ namespace BrockAllen.OAuth2
             var ctx = HttpContext.Current;
             var cookie = ctx.Request.Cookies[AuthorizationContextCookieName];
             if (cookie == null) return null;
-            
+
             var json = Encoding.UTF8.GetString(Unprotect(cookie.Value));
             var authCtx = AuthorizationContext.Parse(json);
 

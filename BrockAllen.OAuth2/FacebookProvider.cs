@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Linq;
 using System.Security.Claims;
 using System.Text;
@@ -10,12 +11,12 @@ namespace BrockAllen.OAuth2
 {
     class FacebookProvider : Provider
     {
-        public FacebookProvider(string clientID, string clientSecret, string scope)
-            : base(ProviderType.Facebook,                
+        public FacebookProvider(string clientID, string clientSecret, string scope, NameValueCollection additionalParams = null)
+            : base(ProviderType.Facebook,
                 "https://www.facebook.com/dialog/oauth",
                 "https://graph.facebook.com/oauth/access_token",
                 "https://graph.facebook.com/me",
-                clientID, clientSecret)
+                clientID, clientSecret, additionalParams: additionalParams)
         {
             if (scope == null)
             {
@@ -40,7 +41,7 @@ namespace BrockAllen.OAuth2
             supportedClaimTypes.Add("locale", ClaimTypes.Locality);
             supportedClaimTypes.Add("email", ClaimTypes.Email);
         }
-        
+
         internal override Dictionary<string, string> SupportedClaimTypes
         {
             get { return supportedClaimTypes; }
