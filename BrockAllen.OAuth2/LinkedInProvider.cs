@@ -11,12 +11,12 @@ namespace BrockAllen.OAuth2
 {
     class LinkedInProvider : Provider
     {
-        public LinkedInProvider(string clientID, string clientSecret, string scope)
+        public LinkedInProvider(string clientID, string clientSecret, string scope, NameValueCollection additionalParams = null)
             : base(ProviderType.LinkedIn,
                 "https://www.linkedin.com/uas/oauth2/authorization",
                 "https://www.linkedin.com/uas/oauth2/accessToken",
                 "https://api.linkedin.com/v1/people/~:(id,first-name,last-name,email-address,picture-url,formatted-name,location:(country:(code)),public-profile-url)",
-                clientID, clientSecret, "oauth2_access_token", new NameValueCollection(){ { "format", "json" } })
+                clientID, clientSecret, "oauth2_access_token", LinkedInProvider.AdditionalParameters(additionalParams))
         {
             if (scope == null)
             {
@@ -26,6 +26,18 @@ namespace BrockAllen.OAuth2
             {
                 Scope = scope;
             }
+        }
+
+        private static NameValueCollection AdditionalParameters(NameValueCollection additionalParams)
+        {
+            if (additionalParams == null)
+            {
+                additionalParams = new NameValueCollection();
+            }
+
+            additionalParams.Add("format", "json");
+
+            return additionalParams;
         }
 
         protected override IEnumerable<Claim> GetClaimsFromProfile(Dictionary<string, object> profile)
@@ -38,7 +50,7 @@ namespace BrockAllen.OAuth2
             claims.Remove(localityClaim);
 
             localityClaim = new Claim(localityClaim.Type, location.Country.Code);
-            
+
             claims.Add(localityClaim);
 
             return claims;
@@ -56,12 +68,12 @@ namespace BrockAllen.OAuth2
             supportedClaimTypes.Add("location", ClaimTypes.Locality);
             supportedClaimTypes.Add("pictureUrl", ClaimTypes.UserData);
         }
-        
+
         internal override Dictionary<string, string> SupportedClaimTypes
         {
             get { return supportedClaimTypes; }
         }
-        
+
         private class LinkedInLocation
         {
             [JsonProperty("country")]

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Linq;
 using System.Security.Claims;
 using System.Text;
@@ -11,12 +12,12 @@ namespace BrockAllen.OAuth2
     {
 
 
-        public GoogleProvider(string clientID, string clientSecret, string scope)
-            : base(ProviderType.Google,                
+        public GoogleProvider(string clientID, string clientSecret, string scope, NameValueCollection additionalParams = null)
+            : base(ProviderType.Google,
                 "https://accounts.google.com/o/oauth2/auth",
                 "https://accounts.google.com/o/oauth2/token",
                 "https://www.googleapis.com/oauth2/v1/userinfo",
-                clientID, clientSecret)
+                clientID, clientSecret, additionalParams: additionalParams)
         {
             if (scope == null)
             {
@@ -41,7 +42,7 @@ namespace BrockAllen.OAuth2
             supportedClaimTypes.Add("link", ClaimTypes.Webpage);
             supportedClaimTypes.Add("locale", ClaimTypes.Locality);
         }
-        
+
         internal override Dictionary<string, string> SupportedClaimTypes
         {
             get { return supportedClaimTypes; }
